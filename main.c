@@ -8,20 +8,19 @@
 
 int main(int argc,char** argv){
 	Automate automate;
-	int i=0;
 	if(argc == 1){
-		printf("Veuillez specifier le fichier de l'automate et un mot \n");
+		printf("Veuillez specifier le fichier de l'automate et un mot\n");
+		exit(EXIT_FAILURE);
 	}else if(argc == 2)	{
-		printf("Aucun mot !\n");
+		printf("Aucun mot\n");
 		printf("Fichier de l'automate %s \n",argv[1]);
+		exit(EXIT_FAILURE);
 	}else{
 		printf("Fichier de l'automate %s \n",argv[1]);
 		printf("Mot: %s \n",argv[2]);
 	}
 	automate = read_file(argv[1]);
-	for(i=0;i<automate.nb_etats;i++){
-		printf("Etats : %d -> %d\n",automate.Etats[i].id,automate.Etats[i].accepteur);
-	}
+	print_automate(automate);
 	return 0;
 }
 

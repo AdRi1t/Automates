@@ -13,7 +13,6 @@ Automate read_file(char* file_tmp){
 	int* id_accepteurs = NULL;
 	int nb_etat;
 	Automate automate;
-	Etat* Etats = NULL;
 	
 	line = (char*)calloc(256,sizeof(char));
 	file_name = (char*)calloc(FILENAME_MAX,sizeof(char));
@@ -27,32 +26,21 @@ Automate read_file(char* file_tmp){
 		automate.nb_etats = nb_etat;
 		fgets(line,256,automate_file);
 		id_accepteurs = numbers_from_string(line,nb_etat);
-		Etats = init_etats(nb_etat,id_accepteurs);
-		automate.Etats = Etats;
+		init_etats(nb_etat,id_accepteurs,&automate);
+		automate.nb_transition = 0;
+		automate.Transitions = (Transition*)malloc(sizeof(Transition)*0);
 		while( feof(automate_file) == 0 ){
 			fgets(line,256,automate_file);
-			printf(line);
+			add_transition(line,&automate);
 		}
 	}else{
 		perror(file_name);
 		exit(EXIT_FAILURE);
 	}
+	fclose(automate_file);
 	free(file_name);
 	free(line);
 	return automate;
-}
-
-int compte_ligne_fichier(FILE* fichier){
-	char c = '0';
-	int lines = 0;
-	rewind(fichier);
-	while (c!=EOF){
-		c=fgetc(fichier);
-		if (c=='\n'){	
-			lines+=1;
-		}
-	}
-	return lines;
 }
 
 int* numbers_from_string(char* str_read, int nb_numbers) {
@@ -75,7 +63,34 @@ int* numbers_from_string(char* str_read, int nb_numbers) {
   return numbers;
 }
 
-Etat* init_etats(int nb_etats, int* id_etats_accepteur){
+void add_transition(char* str,Automate* automate){
+	char* ptr_str = str;
+	int count = 0;
+	long id_etat = 0;
+	Transition transition;
+	while(count != 3){
+		if (isalpha(*ptr_str) && count == 1){
+			transition.caractere_lu = *ptr_str;
+			count += 1;
+		}
+		if(isdigit(*ptr_str) && count == 0){
+			id_etat = strtol(ptr_str, &ptr_str, 10);
+			transition.initiale = &(automate->Etats[id_etat]);
+			count += 1;
+		}
+		if(isdigit(*ptr_str) && count == 2){
+			id_etat = strtol(ptr_str, &ptr_str, 10);
+			transition.fin = &(automate->Etats[id_etat]);
+			count += 1;
+		}
+		ptr_str += 1;
+	}
+	automate->nb_transition += 1;
+	automate->Transitions = (Transition*)realloc(automate->Transitions,(automate->nb_transition+1) * sizeof(Transition));
+	automate->Transitions[automate->nb_transition] = transition;
+}
+
+void init_etats(int nb_etats, int* id_etats_accepteur,Automate* automate){
 	Etat* Etats = NULL;
 	Etats = (Etat*)malloc(nb_etats*sizeof(Etat));
 	int count = 0;
@@ -90,5 +105,32 @@ Etat* init_etats(int nb_etats, int* id_etats_accepteur){
 			Etats[i].accepteur = 0;
 		}
 	}
-	return Etats;
+	automate->Etats = Etats;
+}
+
+void print_automate(Automate automate){
+	int i=0;
+	printf("%d\n",automate.nb_etats);
+	for(i=0;i<automate.nb_etats;i++){
+		if(automate.Etats[i].accepteur == 1){
+			printf("%d ",automate.Etats[i].id);
+		}
+	}
+	printf("\n");
+	for(i=1;i<automate.nb_transition;i++){
+		printf("%d %c %d\n",automate.Transitions[i].initiale->id,automate.Transitions[i].caractere_lu,automate.Transitions[i].fin->id);
+	}
+}
+
+int compte_ligne_fichier(FILE* fichier){
+	char c = '0';
+	int lines = 0;
+	rewind(fichier);
+	while (c!=EOF){
+		c=fgetc(fichier);
+		if (c=='\n'){	
+			lines+=1;
+		}
+	}
+	return lines;
 }
