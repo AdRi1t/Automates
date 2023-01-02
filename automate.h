@@ -10,7 +10,8 @@
 
 #define TRUE 1
 #define FALSE 0
-
+#define ALPHABET {'a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z'}
+#define LEN_ALPHABET 26
 
 /*structure pour un état*/
 typedef struct{
@@ -33,12 +34,26 @@ typedef struct{
 	Transition* Transitions;
 }Automate;
 
+typedef struct{
+	size_t size;
+	State* list;
+}Set_State;
 
 /***automate.c***/
 
 /*Permet de faire une exécution sur un mot*/
 int word_execution(Automate automate,const char* word);
 
+/*Fait la déterminisation d'un automate*/
+Automate automate_determination(Automate automate_source);
+
+/*Ajoute un état a l'automate*/
+void add_State(State state,Automate* automate);
+
+/*Renvoie les états atteint quand on part d'une liste d'états pour lire un caractère*/
+Set_State find_end(char character_test, Automate automate, Set_State states_test);
+
+int is_in_set(Set_State set, State test_state);
 
 /***loadAutomate.c***/
 
@@ -50,6 +65,9 @@ void init_states(int nb_states, int* acceptor_states,Automate* automate);
 
 /*lit une transition et l'ajoute à l'automate*/
 void add_transition(char* line, Automate* automate);	
+
+/*initialise l'automate*/
+void init_automate(Automate* automate);
 
 /*lit une transition et l'ajoute à l'automate*/
 void print_automate(Automate automate);	

@@ -9,6 +9,7 @@ Automate read_file(char* file_tmp){
 	int nb_states;
 	Automate automate;
 	
+	init_automate(&automate);
 	line = (char*)calloc(256,sizeof(char));
 	file_name = (char*)calloc(FILENAME_MAX,sizeof(char));
 	strcpy(file_name,"Automates/");
@@ -22,8 +23,6 @@ Automate read_file(char* file_tmp){
 		fgets(line,256,automate_file);
 		id_acceptor = numbers_from_string(line,nb_states);
 		init_states(nb_states,id_acceptor,&automate);
-		automate.nb_transition = 0;
-		automate.Transitions = (Transition*)malloc(sizeof(Transition)*1);
 		while( feof(automate_file) == 0 ){
 			fgets(line,256,automate_file);
 			add_transition(line,&automate);
@@ -101,6 +100,13 @@ void init_states(int nb_etats, int* id_etats_accepteur,Automate* automate){
 		}
 	}
 	automate->States = States;
+}
+
+void init_automate(Automate* automate){
+	automate->nb_states = 0;
+	automate->nb_transition = 0;
+	automate->States = (State*)malloc(sizeof(State)*1);
+	automate->Transitions = (Transition*)malloc(sizeof(Transition)*1);
 }
 
 void print_automate(Automate automate){

@@ -2,9 +2,12 @@
 
 
 int main(int argc,char** argv){
+	Automate automate;
+	Automate automate_determined;
 	int i = 2;
 	char** mots = NULL;
 	short nb_mots = 0;
+	
 	if(getopt(argc,argv,"h") == 'h' ){
 		printf("Commande: DetMin [nom du fichier] [mot à tester]\n");
 		return 0;
@@ -27,11 +30,11 @@ int main(int argc,char** argv){
 		}
 	}
 	
-	Automate automate;
 	automate = read_file(argv[1]);
 	print_automate(automate);
 	word_execution(automate,mots[0]);
-	
+	automate_determined = automate_determination(automate);
+	print_automate(automate_determined);
 	return 0;
 }
 
