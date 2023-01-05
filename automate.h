@@ -10,8 +10,8 @@
 
 #define TRUE 1
 #define FALSE 0
-#define ALPHABET {'a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z'}
-#define LEN_ALPHABET 26
+#define ALPHABET {'a','b'}
+#define LEN_ALPHABET 2
 
 /*structure pour un état*/
 typedef struct{
@@ -30,49 +30,81 @@ typedef struct{
 typedef struct{
 	int nb_states;
 	int nb_transition;
+	int nb_alphabet;
 	State* States;
 	Transition* Transitions;
+	char* alphabet;
 }Automate;
 
+/*Permets d'avoir une liste d'etats avec sa taille*/
 typedef struct{
-	size_t size;
+	int size;
 	State* list;
 }Set_State;
 
 /***automate.c***/
 
+/*Initialise l'automate*/
+void init_automate(Automate* automate);
+
+/*Lit une transition et l'ajoute à l'automate*/
+void print_automate(Automate automate);	
+
 /*Permet de faire une exécution sur un mot*/
 int word_execution(Automate automate,const char* word);
 
-/*Fait la déterminisation d'un automate*/
-Automate automate_determination(Automate automate_source);
-
-/*Ajoute un état a l'automate*/
-void add_State(State state,Automate* automate);
+/*Permet de faire une exécution sur un mot*/
+int word_execution2(Automate automate,const char* word,State state,int len);
 
 /*Renvoie les états atteint quand on part d'une liste d'états pour lire un caractère*/
 Set_State find_end(char character_test, Automate automate, Set_State states_test);
 
-int is_in_set(Set_State set, State test_state);
+/*Ajoute un état a l'automate*/
+void add_state(State* state,Automate* automate);
+
+void add_transition(State* start_state,char read_character,State* end_state,Automate* automate);
+
+void add_character(char letter,Automate* automate);
 
 /***loadAutomate.c***/
 
 /*Renvoie un automate initialiser à partir d'un fichier*/
 Automate read_file(char* file_name);
 
-/*initialise la liste des états à partir du nombre d'états et de la liste des états accepteur*/
+/*Initialise la liste des états à partir du nombre d'états et de la liste des états accepteur*/
 void init_states(int nb_states, int* acceptor_states,Automate* automate);
 
-/*lit une transition et l'ajoute à l'automate*/
-void add_transition(char* line, Automate* automate);	
+/*Lit une transition et l'ajoute à l'automate*/
+void set_transition(char* line, Automate* automate);	
 
-/*initialise l'automate*/
-void init_automate(Automate* automate);
+/*Ajoute un character si il n'est pas déja dans l'alphabet*/
+void set_character(char letter,Automate* automate);
 
-/*lit une transition et l'ajoute à l'automate*/
-void print_automate(Automate automate);	
-
-/*lit un ensemble de nombres depuis une chaine caractère*/
+/*Lit un ensemble de nombres depuis une chaine caractère*/
 int* numbers_from_string(char* line, int nb_of_int);	
+
+
+/***set.c***/
+
+/*Initialise un set avec un espace de mémoire*/
+void init_set(Set_State* set);
+
+/*Ajoute un etat dans un set*/
+void add_state_set(Set_State* set,State state);
+
+/* Renvoie vrai si un etat se trouve dans un ensemble d'etats*/
+int is_in_set(Set_State set, State test_state);
+
+/*Renvoie vrai si un ensemble d'etats est présent dans une liste d'ensemble d'etats*/
+int is_in_set_list(Set_State* set_list, Set_State test_set,int len);
+
+/*Trouve l'index d'un set dans une liste de set*/
+int index_in_set_list(Set_State* set_list, Set_State test_set,int len);
+
+/*Ajoute un set dans une liste de Set*/
+void add_set_list(Set_State** set_list,Set_State set,int* len);
+
+/*Supprime le dernier indice d'une liste de set*/
+Set_State pop_set_list(Set_State** set_list,int* len);
 
 #endif

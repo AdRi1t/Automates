@@ -25,7 +25,9 @@ Automate read_file(char* file_tmp){
 		init_states(nb_states,id_acceptor,&automate);
 		while( feof(automate_file) == 0 ){
 			fgets(line,256,automate_file);
-			add_transition(line,&automate);
+			if(strlen(line) > 1){
+				set_transition(line,&automate);
+			}
 		}
 	}else{
 		perror(file_name);
@@ -57,13 +59,14 @@ int* numbers_from_string(char* str_read, int nb_numbers) {
   return numbers;
 }
 
-void add_transition(char* str,Automate* automate){
+void set_transition(char* str,Automate* automate){
 	char* ptr_str = str;
 	int count = 0;
 	long id_etat = 0;
 	Transition transition;
 	while(count != 3){
 		if (isalpha(*ptr_str) && count == 1){
+			set_character(*ptr_str,automate);
 			transition.read_character = *ptr_str;
 			count += 1;
 		}
@@ -84,6 +87,16 @@ void add_transition(char* str,Automate* automate){
 	automate->nb_transition += 1;
 }
 
+void set_character(char letter,Automate* automate){
+	int i = 0;
+	for(i=0;i<automate->nb_alphabet;i++){
+		 if(automate->alphabet[i] == letter){
+			return;
+		}
+	}
+	add_character(letter,automate);
+}
+
 void init_states(int nb_etats, int* id_etats_accepteur,Automate* automate){
 	State* States = NULL;
 	States = (State*)malloc(nb_etats*sizeof(State));
@@ -102,26 +115,6 @@ void init_states(int nb_etats, int* id_etats_accepteur,Automate* automate){
 	automate->States = States;
 }
 
-void init_automate(Automate* automate){
-	automate->nb_states = 0;
-	automate->nb_transition = 0;
-	automate->States = (State*)malloc(sizeof(State)*1);
-	automate->Transitions = (Transition*)malloc(sizeof(Transition)*1);
-}
-
-void print_automate(Automate automate){
-	int i=0;
-	printf("%d\n",automate.nb_states);
-	for(i=0;i<automate.nb_states;i++){
-		if(automate.States[i].acceptor == TRUE){
-			printf("%d ",automate.States[i].id);
-		}
-	}
-	printf("\n");
-	for(i=0;i<automate.nb_transition;i++){
-		printf("%d %c %d\n",automate.Transitions[i].initial->id,automate.Transitions[i].read_character,automate.Transitions[i].end->id);
-	}
-}
 
 int cmpt_line_file(FILE* file){
 	char c = '0';

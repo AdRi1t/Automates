@@ -32,9 +32,9 @@ int main(int argc,char** argv){
 	
 	automate = read_file(argv[1]);
 	print_automate(automate);
-	word_execution(automate,mots[0]);
-	automate_determined = automate_determination(automate);
-	print_automate(automate_determined);
+	word_execution2(automate,mots[0],automate.States[0],0);
+
+
 	return 0;
 }
 
