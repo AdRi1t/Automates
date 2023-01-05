@@ -72,6 +72,11 @@ void add_transition(State* start_state,char read_character,State* end_state,Auto
 /*Ajoute un caractère à l'alphabet de l'automate*/
 void add_character(char letter,Automate* automate);
 
+/*Fonction qui renvoye un automate déterministe*/
+Automate determinisation_automate(Automate AFN);
+
+Automate automate_determinisation(Automate automate_source);
+
 /***loadAutomate.c***/
 
 /*Renvoie un automate initialiser à partir d'un fichier*/
@@ -88,9 +93,6 @@ void set_character(char letter,Automate* automate);
 
 /*Lit un ensemble de nombres depuis une chaine caractère*/
 int* numbers_from_string(char* line, int nb_of_int);	
-
-/*Fonction qui renvoye un automate déterministe*/
-Automate determinisation_automate(Automate AFN);
 
 
 /***set.c***/

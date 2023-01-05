@@ -7,7 +7,7 @@ void init_set(Set_State* set){
 
 void init_transition(Transition* transition){
 	transition->initial = NULL;
-	transition->read_character = "";
+	transition->read_character = '\0';
 	transition->end = NULL;
 }
 
