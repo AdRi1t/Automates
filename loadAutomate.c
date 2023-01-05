@@ -1,6 +1,5 @@
 #include "automate.h"
 
-
 Automate read_file(char* file_tmp){
 	char* file_name = NULL;
 	char* line = NULL;

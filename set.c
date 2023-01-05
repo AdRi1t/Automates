@@ -5,6 +5,12 @@ void init_set(Set_State* set){
 	set->list = (State*)malloc(sizeof(State)*1);
 }
 
+void init_transition(Transition* transition){
+	transition->initial = NULL;
+	transition->read_character = "";
+	transition->end = NULL;
+}
+
 void add_state_set(Set_State* set,State state){
 	set->list = realloc(set->list,(set->size+1)*sizeof(State));
 	set->list[set->size] = state;
@@ -37,6 +43,20 @@ int is_in_set(Set_State set, State test_state){
 		}
 	}
 	return is_in;
+}
+
+int is_acceptor(State state,Automate AF)
+{
+	int is_acceptor = FALSE;
+	int i=0;
+	for(i=0;i<AF.nb_states;i++)
+	{
+		if((AF.States[i].id == state.id)&&(AF.States[i].acceptor == TRUE ))
+		{
+			return TRUE;
+		}
+	}
+	return is_acceptor;
 }
 
 int is_in_set_list(Set_State* set_list, Set_State test_set,int len){
@@ -76,3 +96,28 @@ int index_in_set_list(Set_State* set_list, Set_State test_set,int len){
 	}
 	return index;
 }
+
+/*
+int is_unique()
+{
+	int i,j;
+	int count; // Compte les ocurrences
+	
+	for(i=0;i<sizeofliste1;i++)
+	{
+		for(j=0;i<sizeofliste2;j++)
+		{
+			if(elementliste1 = elementliste2)
+			{
+				count += 1;
+				if(count == sizeofliste1)
+				{
+					return false;
+				}
+			}
+			else
+			{
+			}
+		}
+	}
+}*/

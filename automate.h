@@ -10,8 +10,6 @@
 
 #define TRUE 1
 #define FALSE 0
-#define ALPHABET {'a','b'}
-#define LEN_ALPHABET 2
 
 /*structure pour un état*/
 typedef struct{
@@ -47,8 +45,14 @@ typedef struct{
 /*Initialise l'automate*/
 void init_automate(Automate* automate);
 
-/*Lit une transition et l'ajoute à l'automate*/
-void print_automate(Automate automate);	
+/* Initialise Transition */
+void init_transition(Transition* transition);
+
+/* Affiche les données d'automate*/
+void print_automate(Automate automate);
+
+/* Affiche l'alphabet d'un automate en entrée */
+void print_alphabet(Automate automate);
 
 /*Permet de faire une exécution sur un mot*/
 int word_execution(Automate automate,const char* word);
@@ -62,8 +66,10 @@ Set_State find_end(char character_test, Automate automate, Set_State states_test
 /*Ajoute un état a l'automate*/
 void add_state(State* state,Automate* automate);
 
+/*Ajoute une transition à l'automate*/
 void add_transition(State* start_state,char read_character,State* end_state,Automate* automate);
 
+/*Ajoute un caractère à l'alphabet de l'automate*/
 void add_character(char letter,Automate* automate);
 
 /***loadAutomate.c***/
@@ -83,6 +89,9 @@ void set_character(char letter,Automate* automate);
 /*Lit un ensemble de nombres depuis une chaine caractère*/
 int* numbers_from_string(char* line, int nb_of_int);	
 
+/*Fonction qui renvoye un automate déterministe*/
+Automate determinisation_automate(Automate AFN);
+
 
 /***set.c***/
 
@@ -94,6 +103,9 @@ void add_state_set(Set_State* set,State state);
 
 /* Renvoie vrai si un etat se trouve dans un ensemble d'etats*/
 int is_in_set(Set_State set, State test_state);
+
+/* Renvoie vrai si un etat est accepteur */
+int is_acceptor(State state,Automate AF);
 
 /*Renvoie vrai si un ensemble d'etats est présent dans une liste d'ensemble d'etats*/
 int is_in_set_list(Set_State* set_list, Set_State test_set,int len);
