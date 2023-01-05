@@ -35,12 +35,12 @@ void add_state(State* state,Automate* automate){
 
 void add_transition(State* start_state,char read_character,State* end_state,Automate* automate){
 	Transition transition;
-	transition.initial = start_state;
-	transition.read_character = read_character;
-	transition.end = end_state;
+	init_transition(&transition);
+	
 	automate->Transitions = (Transition*)realloc(automate->Transitions,(automate->nb_transition+1) * sizeof(Transition));
 	automate->Transitions[automate->nb_transition] = transition;
 	automate->nb_transition += 1;	
+	
 }
 
 void add_character(char letter,Automate* automate){
@@ -135,6 +135,78 @@ int word_execution(Automate automate, const char* word){
 	return 0;
 }
 
+Automate determinisation_automate(Automate AFN)
+{
+	// Création et initialisation d'un automate
+	Automate AFD;
+	init_automate(&AFD);
+	AFD.nb_alphabet = AFN.nb_alphabet;
+	AFD.alphabet = AFN.alphabet;
+	add_state(&AFN.States[0],&AFD);
+	
+	printf("Etat initiale : %d\n",AFD.States[0].id);
+	
+	Set_State* tab_transition = (Set_State*)malloc(sizeof(Set_State)*1); // Va nous servir à stocker toutes les transitions
+	
+	State new_state;
+	new_state.id = 0;
+	new_state.acceptor = FALSE;
+	
+	int i,j,k; 
+	
+	//Parcourt l'ensembles des états de AFN
+	for(i=0;i<AFN.nb_states;i++)
+	{
+		init_set(&tab_transition[i]);
+		// Parcourt l'ensemble des caractère de l'alphabet
+		for(j=0;j<AFD.nb_alphabet;j++)
+		{
+			// Parcourt l'ensemble des transition de AFN
+			for(k=0;k<AFN.nb_transition;k++)
+			{	
+				if((AFN.Transitions[k].initial->id == AFN.States[i].id)
+				&&(AFD.alphabet[j] == AFN.Transitions[k].read_character))
+				{
+					// Si on trouve une transition
+					add_state_set(&tab_transition[i],*(AFN.Transitions[k].end));
+					
+					printf("---------------------------------------\n");
+					printf("Transition trouvé !!! : Ajoute d'un élément dans la liste [%d][%c]\n",i,AFD.alphabet[j]);
+					printf("Valeur ajouté à la liste [%d][%c] : %d\n",i,AFD.alphabet[j],AFN.Transitions[k].end->id);
+					printf("---------------------------------------\n");
+					
+					//On vérifie que le nouvel est un état accepeteur
+					// Si l'élément ajouté est dans la liste des éltats accepteur
+					if(is_acceptor(*(AFN.Transitions[k].end),AFN) == TRUE)
+					{
+						new_state.acceptor = TRUE;
+						printf(" %d est accepteur !!!\n",AFN.Transitions[k].end->id);
+					}
+					else
+					{
+						new_state.acceptor = FALSE;
+					}
+				}
+				else
+				{		
+				}
+				
+			}
+			// Lorsque l'on a fini de faire toutes les transitions
+			// On créer un lien entre l'état actuelle AFN et le nouvelle état obtenue pour AFD
+			new_state.id = AFD.nb_states + 1;
+			
+			add_state(&new_state,&AFD);
+			add_transition(AFN.Transitions[k].initial,AFD.alphabet[j],&new_state,&AFD);
+		}
+		
+	}
+	
+	printf("Fin du Programme\n");
+	
+	return AFD;
+}
+
 Set_State find_end(char character_test, Automate automate, Set_State states_test){
 	int i = 0;
 	int j = 0;
@@ -151,4 +223,16 @@ Set_State find_end(char character_test, Automate automate, Set_State states_test
 		}
 	}
 	return end_states;
+}
+
+void print_alphabet(Automate automate)
+{
+	printf("---------- Alphabet de l'automate ----------------\n");
+	int i = 0;
+	
+	for(i=0;i<automate.nb_alphabet;i++)
+	{
+		printf(" %c\n",automate.alphabet[i]);
+	}
+	printf("---------------------------------------------------\n");
 }

@@ -4,6 +4,7 @@
 int main(int argc,char** argv){
 	Automate automate;
 	Automate automate_determined;
+	
 	int i = 2;
 	char** mots = NULL;
 	short nb_mots = 0;
@@ -29,10 +30,11 @@ int main(int argc,char** argv){
 			i++;
 		}
 	}
-	
 	automate = read_file(argv[1]);
 	print_automate(automate);
-	word_execution2(automate,mots[0],automate.States[0],0);
+	automate_determined = determinisation_automate(automate);
+	print_automate(automate_determined);
+	//word_execution2(automate,mots[0],automate.States[0],0);
 
 
 	return 0;
