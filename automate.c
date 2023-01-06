@@ -1,16 +1,22 @@
 #include "automate.h"
 
 void init_automate(Automate* automate){
+	
 	automate->nb_states = 0;
 	automate->nb_alphabet = 0;
 	automate->nb_transition = 0;
+	
 	automate->States = (State*)malloc(sizeof(State)*1);
 	automate->alphabet = (char*)calloc(1,sizeof(char));
 	automate->Transitions = (Transition*)malloc(sizeof(Transition)*1);
+	
+	return;
 }
 
 void print_automate(Automate automate){
+	
 	int i=0;
+	
 	printf("%d\n",automate.nb_states);
 	for(i=0;i<automate.nb_states;i++){
 		if(automate.States[i].acceptor == TRUE){
@@ -18,50 +24,67 @@ void print_automate(Automate automate){
 		}
 	}
 	printf("\n");
+	
 	for(i=0;i<automate.nb_alphabet;i++){
 		printf("%c ",automate.alphabet[i]);
 	}
 	printf("\n");
+	
 	for(i=0;i<automate.nb_transition;i++){
 		printf("%d %c %d\n",automate.Transitions[i].initial->id,automate.Transitions[i].read_character,automate.Transitions[i].end->id);
 	}
+	printf("\n");
+	
+	return;
 }
 
 void add_state(State* state,Automate* automate){
+	
 	automate->States = (State*)realloc(automate->States,(automate->nb_states+1) * sizeof(State));
 	automate->States[automate->nb_states] = *state;
 	automate->nb_states += 1;
+	
+	return;
 }
 
 void add_transition(State* start_state,char read_character,State* end_state,Automate* automate){
+	
 	Transition transition;
+	
 	init_transition(&transition);
 	transition.initial = start_state;
 	transition.read_character = read_character;
 	transition.end = end_state;
+	
 	automate->Transitions = (Transition*)realloc(automate->Transitions,(automate->nb_transition+1) * sizeof(Transition));
 	automate->Transitions[automate->nb_transition] = transition;
 	automate->nb_transition += 1;	
 	
+	return;
 }
 
 void add_character(char letter,Automate* automate){
+	
 	automate->alphabet = (char*)realloc(automate->alphabet,(automate->nb_alphabet+1)*sizeof(char));
 	automate->alphabet[automate->nb_alphabet] = letter;
 	automate->nb_alphabet += 1;
+	
+	return;
 }
 
 int word_execution2(Automate automate,const char* word,State state,int len){
-	int i=0;
-	int j=0;
+	
+	int i,j;
 	int result = 0;
 	int loop_without_transition = TRUE;
+	
 	if(strlen(word) == 0 ){
 		if(state.acceptor == TRUE){
 			printf("(%d, ) |- ",state.id);
 			printf("OK\n");
 			return TRUE;
-		}else{
+		}
+		else{
 			printf("(%d, %s) |- ",state.id,word);
 			printf("KO\n");
 			for(j=0;j<len;j++){
@@ -77,6 +100,7 @@ int word_execution2(Automate automate,const char* word,State state,int len){
 				loop_without_transition = FALSE;
 				len += (8 + strlen(word));
 				result = word_execution2(automate,word+1,*(automate.Transitions[i].end),len);
+				
 				if(result == TRUE){
 					return TRUE;
 				}
@@ -89,53 +113,105 @@ int word_execution2(Automate automate,const char* word,State state,int len){
 			printf(" ");
 		}
 	}
+	
 	return FALSE;
 }
 
-int word_execution(Automate automate, const char* word){
-	int i=0;
-	State current_state = automate.States[0];
-	int loop_without_transition;
-	char* cursor = NULL;
-	int success = TRUE;
-	cursor = (char*)calloc(sizeof(word),sizeof(char));
-	strcpy(cursor,word);
+void print_resultat(int valeur)
+{
+	if(valeur == TRUE){
+		printf("\n");
+		printf("OK\n");
+		printf("\n");
+	}
+	else{
+		printf("\n");
+		printf("KO\n");
+		printf("\n");
+	}
 	
-	while(*cursor != '\0'){
-		loop_without_transition += 1;
-		for(i=0;i<automate.nb_transition;i++){
-			if(automate.Transitions[i].initial->id == current_state.id){
-				if(automate.Transitions[i].read_character == *cursor){
-					current_state = *(automate.Transitions[i].end);
-					printf("(%d,%s) |- ",automate.Transitions[i].initial->id,cursor);
-					loop_without_transition = 0;
-					if(current_state.acceptor == FALSE){
-						success = FALSE;
-					}else{
-						success = TRUE;
-					}
+	return;
+}
+
+void print_automate2(Automate automate)
+{
+	int i,j;
+	
+	printf("%d\n",automate.nb_states);
+	for(i=0;i<automate.nb_states;i++){
+		if(automate.States[i].acceptor == TRUE){
+			printf("%d ",automate.States[i].id);
+		}
+	}
+	printf("\n");
+	
+	printf("  ");
+	for(i=0;i<automate.nb_alphabet;i++){
+		printf("%c ",automate.alphabet[i]);
+	}
+	printf("\n");
+	
+	for(i=0;i<automate.nb_transition;i=i+automate.nb_alphabet){
+		
+		printf("%d ",automate.Transitions[i].initial->id);
+		for(j=0;j<automate.nb_alphabet;j++){
+			
+			printf("%d ",automate.Transitions[i+j].end->id);
+		}
+		printf("\n");
+	}
+	printf("\n");
+	
+	return;
+}
+
+Set_State find_end(char character_test, Automate automate, Set_State states_test){
+	
+	int i,j;
+	Set_State end_states;
+	State null_state;
+	init_set(&end_states);
+	
+	for(i=0;i<states_test.size;i++){
+		for(j=0;j<automate.nb_transition;j++){
+				if(states_test.list[0].id == -1){
+					null_state.id = -1;
+					null_state.acceptor = FALSE;
+					add_state_set(&end_states,null_state);
+					
+					return end_states;
+				}
+			if(states_test.list[i].id == automate.Transitions[j].initial->id
+			&& character_test == automate.Transitions[j].read_character){
+				if(is_in_set(end_states,*(automate.Transitions[j].end)) == FALSE){
+					add_state_set(&end_states,*(automate.Transitions[j].end));
 				}
 			}
 		}
-		if(loop_without_transition == 0){
-			cursor++;
-		}
-		if(loop_without_transition == 1){
-			success = FALSE;
-			break;
-		}
 	}
-	if(success == TRUE){
-		printf("(%d, ) |- ",current_state.id);
-		printf("ok\n");
-		return TRUE;
-	}else{
-		printf("(%d, %s) |- ",current_state.id,cursor);
-		printf("ko\n");
-		return FALSE;
+	if(end_states.size == 0 ){
+		
+		null_state.id = -1;
+		null_state.acceptor = FALSE;
+		add_state_set(&end_states,null_state);
 	}
-	return 0;
+	return end_states;
 }
+
+void print_alphabet(Automate automate)
+{
+	printf("---------- Alphabet de l'automate ----------------\n");
+	int i = 0;
+	
+	for(i=0;i<automate.nb_alphabet;i++){
+		
+		printf(" %c\n",automate.alphabet[i]);
+	}
+	printf("---------------------------------------------------\n");
+	
+	return;
+}
+
 int id_end_state(char character_test, Automate automate, State state_test){
 	int i = 0;
 	int j = 0;
@@ -152,28 +228,11 @@ int id_end_state(char character_test, Automate automate, State state_test){
 }
 
 
-void print_alphabet(Automate automate)
-{
-	printf("---------- Alphabet de l'automate ----------------\n");
-	int i = 0;
-	
-	for(i=0;i<automate.nb_alphabet;i++)
-	{
-		printf(" %c\n",automate.alphabet[i]);
-	}
-	printf("---------------------------------------------------\n");
-}
-
-
 Automate automate_determinisation(Automate automate_source){
  
-	int i = 0;
-	int j = 0;
-	int k = 0;
-	int l = 0;
+	int i,j,k,l;
+	
 	Automate automate_determined;
-	State new_state;
-	State null_state;
 	/*Ensemble d'état de départ d'une transition*/
 	Set_State start_set;
 	/*Ensemble d'état de fin d'une transition*/
@@ -192,9 +251,6 @@ Automate automate_determinisation(Automate automate_source){
 	processed = (Set_State*)malloc(sizeof(Set_State)*1);
 	translate = (Set_State*)malloc(sizeof(Set_State)*1);
 	
-	null_state.id = -1;
-	null_state.acceptor = FALSE;
-	
 	init_automate(&automate_determined);
 	automate_determined.nb_alphabet = automate_source.nb_alphabet;
 	automate_determined.alphabet = automate_source.alphabet;
@@ -206,19 +262,24 @@ Automate automate_determinisation(Automate automate_source){
 	
 	/*Tant que on découvre des nouveau ensemble d'état on continue*/
 	while( nb_discovered > 0){
-
+		
 		for(i=0;i<automate_source.nb_alphabet;i++){
 			end_set = find_end(automate_source.alphabet[i],automate_source,start_set);
 			
 			if( is_in_set_list(translate,end_set,nb_translate) == TRUE ){
+				
 				add_set_list(&processed,end_set,&nb_processed);
-			}else if(is_in_set_list(translate,end_set,nb_translate) == FALSE ){
+			}
+			else if(is_in_set_list(translate,end_set,nb_translate) == FALSE ){
+				
 				if( is_in_set_list(discovered,end_set,nb_discovered) == FALSE ){
 					add_set_list(&discovered,end_set,&nb_discovered);
 				}
 				add_set_list(&processed,end_set,&nb_processed);
 			}
+			else{}
 		}
+		
 		/*On a fini de traité l'état*/
 		if(is_in_set_list(translate,start_set,nb_translate)== FALSE){
 			add_set_list(&translate,start_set,&nb_translate);
@@ -228,6 +289,7 @@ Automate automate_determinisation(Automate automate_source){
 			start_set = pop_set_list(&discovered,&nb_discovered);
 		}while(is_in_set_list(translate,start_set,nb_translate));
 	}
+	
 	/*On construit les états de base de l'automate deterministe avec l'indice des ensemble d'états testé*/
 	for(j=0;j<nb_translate;j++){
 		State* p_new_state = (State*)malloc(sizeof(State));
@@ -235,6 +297,7 @@ Automate automate_determinisation(Automate automate_source){
 		p_new_state->acceptor = FALSE;
 		add_state(p_new_state,&automate_determined);
 	}
+	
 	/*On construit les états accepteurs*/
 	for(i=0;i<nb_translate;i++){
 		for(j=0;j<translate[i].size;j++){
@@ -247,18 +310,20 @@ Automate automate_determinisation(Automate automate_source){
 	k = 0 ;
 	for(i=0;i<nb_translate;i++){
 		for(j=0;j<automate_determined.nb_alphabet;j++){
+			
 			l = index_in_set_list(translate,processed[k],nb_translate);
 			add_transition(&automate_determined.States[i],automate_determined.alphabet[j],&automate_determined.States[l],&automate_determined);
 			k += 1;
 		}
 	}
+	
 	return automate_determined;
 }
 
 Automate minimisation_automate(Automate automate_source){
-	int i=0;
-	int j=0;
-	int k=0;
+	
+	int i,j,k;
+	
 	/*compte les nouveaux états*/
 	int different_states = 0;
 	int end = FALSE;
@@ -310,11 +375,11 @@ Automate minimisation_automate(Automate automate_source){
 		}
 	}
 	
-	printf("\minimal_set:\n");
+	printf("minimal_set:\n");
 	for(i=0;i<minimal_set.size;i++){
 		printf("ancien:%d minimal:%d\n",i,minimal_set.list[i].id);
 	}
 	printf("\n");
 
-
+	return automate_minimal;
 }

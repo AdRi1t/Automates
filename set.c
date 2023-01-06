@@ -78,17 +78,6 @@ int is_in_set_list(Set_State* set_list, Set_State test_set,int len){
 	return is_in;
 }
 
-int index_in_set(Set_State set,State test_state){
-	int index = -1;
-	int i=0;
-	for(i=0;i<set.size;i++){
-		if(set.list[i].id == test_state.id){
-			index =  i; 
-		}
-	}
-	return index;
-}
-
 int index_in_set_list(Set_State* set_list, Set_State test_set,int len){
 	int index = -1;
 	int i=0;
@@ -107,60 +96,3 @@ int index_in_set_list(Set_State* set_list, Set_State test_set,int len){
 	}
 	return index;
 }
-
-
-Set_State find_end(char character_test, Automate automate, Set_State states_test){
-	int i = 0;
-	int j = 0;
-	Set_State end_states;
-	State null_state;
-	init_set(&end_states);
-	for(i=0;i<states_test.size;i++){
-		for(j=0;j<automate.nb_transition;j++){
-				if(states_test.list[0].id == -1){
-					null_state.id = -1;
-					null_state.acceptor = FALSE;
-					add_state_set(&end_states,null_state);
-					return end_states;
-				}
-			if(states_test.list[i].id == automate.Transitions[j].initial->id
-			&& character_test == automate.Transitions[j].read_character){
-				if(is_in_set(end_states,*(automate.Transitions[j].end)) == FALSE){
-					add_state_set(&end_states,*(automate.Transitions[j].end));
-				}
-			}
-		}
-	}
-	if(end_states.size == 0 ){
-		null_state.id = -1;
-		null_state.acceptor = FALSE;
-		add_state_set(&end_states,null_state);
-	}
-	return end_states;
-}
-
-
-/*
-int is_unique()
-{
-	int i,j;
-	int count; // Compte les ocurrences
-	
-	for(i=0;i<sizeofliste1;i++)
-	{
-		for(j=0;i<sizeofliste2;j++)
-		{
-			if(elementliste1 = elementliste2)
-			{
-				count += 1;
-				if(count == sizeofliste1)
-				{
-					return false;
-				}
-			}
-			else
-			{
-			}
-		}
-	}
-}*/
