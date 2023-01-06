@@ -36,7 +36,10 @@ void add_state(State* state,Automate* automate){
 void add_transition(State* start_state,char read_character,State* end_state,Automate* automate){
 	Transition transition;
 	init_transition(&transition);
-	
+	transition.initial = start_state;
+	transition.read_character = read_character;
+	transition.end = end_state;
+	printf("%d %c %d\n",start_state->id,read_character,end_state->id);
 	automate->Transitions = (Transition*)realloc(automate->Transitions,(automate->nb_transition+1) * sizeof(Transition));
 	automate->Transitions[automate->nb_transition] = transition;
 	automate->nb_transition += 1;	
@@ -146,13 +149,15 @@ Automate determinisation_automate(Automate AFN)
 	
 	printf("Etat initiale : %d\n",AFD.States[0].id);
 	
-	Set_State* tab_transition = (Set_State*)malloc(sizeof(Set_State)*1); // Va nous servir à stocker toutes les transitions
+	Set_State* tab_transition = (Set_State*)malloc(sizeof(Set_State)*100); // Va nous servir à stocker toutes les transitions
 	
 	State new_state;
 	new_state.id = 0;
 	new_state.acceptor = FALSE;
 	
-	int i,j,k; 
+	int i=0;
+	int j=0;
+	int k=0; 
 	
 	//Parcourt l'ensembles des états de AFN
 	for(i=0;i<AFN.nb_states;i++)
@@ -195,15 +200,16 @@ Automate determinisation_automate(Automate AFN)
 			// Lorsque l'on a fini de faire toutes les transitions
 			// On créer un lien entre l'état actuelle AFN et le nouvelle état obtenue pour AFD
 			new_state.id = AFD.nb_states + 1;
-			
 			add_state(&new_state,&AFD);
-			add_transition(AFN.Transitions[k].initial,AFD.alphabet[j],&new_state,&AFD);
+			State start_state;
+			start_state.id = AFN.Transitions[k].initial->id;
+			start_state.acceptor = AFN.Transitions[k].initial->acceptor;
+			add_transition(&start_state,AFD.alphabet[j],&new_state,&AFD);
 		}
 		
 	}
 	
 	printf("Fin du Programme\n");
-	
 	return AFD;
 }
 
@@ -235,4 +241,119 @@ void print_alphabet(Automate automate)
 		printf(" %c\n",automate.alphabet[i]);
 	}
 	printf("---------------------------------------------------\n");
+}
+
+
+Automate automate_determinisation(Automate automate_source){
+ 
+	int i = 0;
+	int j = 0;
+	int k = 0;
+	int l = 0;
+	Automate automate_determined;
+	State new_state;
+	State null_state;
+	/*Ensemble d'état de départ d'une transition*/
+	Set_State start_set;
+	/*Ensemble d'état de fin d'une transition*/
+	Set_State end_set;
+	/*Pile des états découvert mais pas encore traité*/
+	Set_State* discovered;
+	int nb_discovered = 0;
+	/*Tableau des états d'arrivé pour un caractére donné et un etats de départ*/
+	Set_State* processed;
+	int nb_processed= 0;
+	/*Tableau des nouveau ensemble états qui on été traité*/
+	Set_State* translate;
+	int nb_translate = 0;
+	
+	discovered = (Set_State*)malloc(sizeof(Set_State)*1);
+	processed = (Set_State*)malloc(sizeof(Set_State)*1);
+	translate = (Set_State*)malloc(sizeof(Set_State)*1);
+	
+	new_state.id = 0;
+	new_state.acceptor = TRUE;
+	null_state.id = -1;
+	
+	init_automate(&automate_determined);
+	automate_determined.nb_alphabet = automate_source.nb_alphabet;
+	automate_determined.alphabet = automate_source.alphabet;
+	
+	init_set(&start_set);
+	automate_determined.nb_states = 0;
+	add_state_set(&start_set,automate_source.States[0]);
+	add_set_list(&discovered,start_set,&nb_discovered);
+	
+	/*Tant que on découvre des nouveau ensemble d'état on continue*/
+	while( nb_discovered > 0){
+		for(i=0;i<automate_source.nb_alphabet;i++){
+			end_set = find_end(automate_source.alphabet[i],automate_source,start_set);
+			
+			if( is_in_set_list(translate,end_set,nb_translate)== TRUE && end_set.size > 0){
+				printf("A\n");
+				add_set_list(&processed,end_set,&nb_processed);
+			}else if(is_in_set_list(translate,end_set,nb_translate)== FALSE && end_set.size > 0){
+				printf("B\n");
+				add_set_list(&discovered,end_set,&nb_discovered);
+				add_set_list(&processed,end_set,&nb_processed);
+			}else{
+				printf("C\n");
+				State state;
+				state.id = -1;
+				add_state_set(&end_set,state);
+				add_set_list(&processed,end_set,&nb_processed);
+			}
+		}
+		printf("\n fin Boucle\n");
+		/*On prend un nouvelle état*/
+		start_set = pop_set_list(&discovered,&nb_discovered);
+		/*On a fini de traité état*/
+		add_set_list(&translate,start_set,&nb_translate);
+	}
+	/*On construit les états de base de l'automate deterministe avec l'indice des ensemble d'états testé*/
+	for(j=0;j<nb_translate;j++){
+		State new_state;
+		new_state.id = index_in_set_list(translate,translate[j],nb_translate);
+		new_state.acceptor = FALSE;
+		add_state(&new_state,&automate_determined);
+	}
+	/*On construit les états accepteurs*/
+	for(i=0;i<nb_translate;i++){
+		for(j=0;j<translate[i].size;j++){
+			if(is_acceptor(translate[i].list[j],automate_source)){
+				automate_determined.States[i].acceptor=TRUE;
+			}
+		}
+	}
+	/*On construit les Transition*/
+	k = 0 ;
+	for(i=0;i<nb_translate;i++){
+		for(j=0;j<automate_determined.nb_alphabet;j++){
+			if( is_in_set(processed[k],null_state) == FALSE){
+				l = index_in_set_list(translate,processed[k],nb_translate);
+				add_transition(&automate_determined.States[i],automate_determined.alphabet[j],&automate_determined.States[l],&automate_determined);
+			}
+			k += 1;
+		}
+	}
+	
+	/*
+	printf("k:%d\n",k);
+	for(j=0;j<nb_processed;j++){
+		printf("processed set: %d ",j);
+		for(k=0;k<processed[j].size;k++){
+			printf(" etat:%d",processed[j].list[k].id);
+		}
+		printf("\n");
+	}
+	for(j=0;j<nb_translate;j++){
+		printf("translate set: %d ",j);
+		for(k=0;k<translate[j].size;k++){
+			printf(" etat:%d",translate[j].list[k].id);
+		}
+		printf("\n");
+	}
+	*/
+	return automate_determined;
+
 }
