@@ -244,6 +244,8 @@ void print_alphabet(Automate automate)
 }
 
 
+
+
 Automate automate_determinisation(Automate automate_source){
  
 	int i = 0;
@@ -270,9 +272,7 @@ Automate automate_determinisation(Automate automate_source){
 	discovered = (Set_State*)malloc(sizeof(Set_State)*1);
 	processed = (Set_State*)malloc(sizeof(Set_State)*1);
 	translate = (Set_State*)malloc(sizeof(Set_State)*1);
-	
-	new_state.id = 0;
-	new_state.acceptor = TRUE;
+
 	null_state.id = -1;
 	
 	init_automate(&automate_determined);
@@ -290,14 +290,11 @@ Automate automate_determinisation(Automate automate_source){
 			end_set = find_end(automate_source.alphabet[i],automate_source,start_set);
 			
 			if( is_in_set_list(translate,end_set,nb_translate)== TRUE && end_set.size > 0){
-				printf("A\n");
 				add_set_list(&processed,end_set,&nb_processed);
 			}else if(is_in_set_list(translate,end_set,nb_translate)== FALSE && end_set.size > 0){
-				printf("B\n");
 				add_set_list(&discovered,end_set,&nb_discovered);
 				add_set_list(&processed,end_set,&nb_processed);
 			}else{
-				printf("C\n");
 				State state;
 				state.id = -1;
 				add_state_set(&end_set,state);
@@ -308,14 +305,16 @@ Automate automate_determinisation(Automate automate_source){
 		/*On prend un nouvelle état*/
 		start_set = pop_set_list(&discovered,&nb_discovered);
 		/*On a fini de traité état*/
-		add_set_list(&translate,start_set,&nb_translate);
+		if(is_in_set_list(translate,start_set,nb_translate)== FALSE){
+			add_set_list(&translate,start_set,&nb_translate);
+		}
 	}
 	/*On construit les états de base de l'automate deterministe avec l'indice des ensemble d'états testé*/
 	for(j=0;j<nb_translate;j++){
-		State new_state;
-		new_state.id = index_in_set_list(translate,translate[j],nb_translate);
-		new_state.acceptor = FALSE;
-		add_state(&new_state,&automate_determined);
+		State* p_new_state = (State*)malloc(sizeof(State));
+		p_new_state->id = index_in_set_list(translate,translate[j],nb_translate);
+		p_new_state->acceptor = FALSE;
+		add_state(p_new_state,&automate_determined);
 	}
 	/*On construit les états accepteurs*/
 	for(i=0;i<nb_translate;i++){
@@ -335,8 +334,7 @@ Automate automate_determinisation(Automate automate_source){
 			}
 			k += 1;
 		}
-	}
-	
+	}	
 	/*
 	printf("k:%d\n",k);
 	for(j=0;j<nb_processed;j++){

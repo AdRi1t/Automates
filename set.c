@@ -6,9 +6,9 @@ void init_set(Set_State* set){
 }
 
 void init_transition(Transition* transition){
-	transition->initial = NULL;
-	transition->read_character = '\0';
-	transition->end = NULL;
+	transition->initial = (State*)malloc(sizeof(State)*1);
+    transition->read_character = '\0';
+    transition->end = (State*)malloc(sizeof(State)*1);
 }
 
 void add_state_set(Set_State* set,State state){
