@@ -4,8 +4,11 @@
 int main(int argc,char** argv){
 	Automate automate;
 	Automate automate_determined;
+	Automate automate_minimal;
 	init_automate(&automate);
 	init_automate(&automate_determined);
+	init_automate(&automate_minimal);
+	
 	
 	int i = 2;
 	char** mots = NULL;
@@ -34,11 +37,13 @@ int main(int argc,char** argv){
 	}
 	automate = read_file(argv[1]);
 	print_automate(automate);
+
 	automate_determined = automate_determinisation(automate);
 	print_automate(automate_determined);
 	word_execution2(automate,mots[0],automate.States[0],0);
 	printf("\n");
 	word_execution2(automate_determined,mots[0],automate.States[0],0);
+	automate_minimal = minimisation_automate(automate_determined);
 
 	return 0;
 }

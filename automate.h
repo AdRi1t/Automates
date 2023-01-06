@@ -60,8 +60,7 @@ int word_execution(Automate automate,const char* word);
 /*Permet de faire une exécution sur un mot*/
 int word_execution2(Automate automate,const char* word,State state,int len);
 
-/*Renvoie les états atteint quand on part d'une liste d'états pour lire un caractère*/
-Set_State find_end(char character_test, Automate automate, Set_State states_test);
+int id_end_state(char character_test, Automate automate, State state_test);
 
 /*Ajoute un état a l'automate*/
 void add_state(State* state,Automate* automate);
@@ -76,6 +75,8 @@ void add_character(char letter,Automate* automate);
 Automate determinisation_automate(Automate AFN);
 
 Automate automate_determinisation(Automate automate_source);
+
+Automate minimisation_automate(Automate automate_source);
 
 /***loadAutomate.c***/
 
@@ -120,5 +121,8 @@ void add_set_list(Set_State** set_list,Set_State set,int* len);
 
 /*Supprime le dernier indice d'une liste de set*/
 Set_State pop_set_list(Set_State** set_list,int* len);
+
+/*Renvoie les états atteint quand on part d'une liste d'états pour lire un caractère*/
+Set_State find_end(char character_test, Automate automate, Set_State states_test);
 
 #endif
