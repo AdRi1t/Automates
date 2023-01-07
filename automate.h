@@ -66,9 +66,6 @@ int word_execution2(Automate automate,const char* word,State state,int len);
 /*Permet de renvoyer une valeur en fonction de word_execution2*/
 void print_resultat(int valeur);
 
-/*Renvoie les états atteint quand on part d'une liste d'états pour lire un caractère*/
-Set_State find_end(char character_test, Automate automate, Set_State states_test);
-
 /*Ajoute un état a l'automate*/
 void add_state(State* state,Automate* automate);
 
@@ -79,6 +76,7 @@ void add_transition(State* start_state,char read_character,State* end_state,Auto
 void add_character(char letter,Automate* automate);
 
 int id_end_state(char character_test, Automate automate, State state_test);
+
 
 /***loadAutomate.c***/
 
@@ -97,11 +95,6 @@ void set_character(char letter,Automate* automate);
 /*Lit un ensemble de nombres depuis une chaine caractère*/
 int* numbers_from_string(char* line, int nb_of_int);	
 
-/*Fonction qui renvoye un automate déterministe*/
-Automate automate_determinisation(Automate automate_source);
-
-/*Fonction qui renvoye un automate déterministe minimisé*/
-Automate minimisation_automate(Automate automate_source);
 
 /***set.c***/
 

@@ -42,7 +42,7 @@ int main(int argc,char** argv){
 	
 	automate = read_file(argv[1]);
 	automate_determined = automate_determinisation(automate);
-	automate_minimal = minimisation_automate(automate_determined);
+	automate_minimal = minimisation_automate_recursive(automate_determined);
 	
 	for(j=0;j<3;j++)
 	{
