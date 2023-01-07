@@ -108,7 +108,6 @@ int index_in_set_list(Set_State* set_list, Set_State test_set,int len){
 	return index;
 }
 
-
 Set_State find_end(char character_test, Automate automate, Set_State states_test){
 	int i = 0;
 	int j = 0;
@@ -138,29 +137,3 @@ Set_State find_end(char character_test, Automate automate, Set_State states_test
 	}
 	return end_states;
 }
-
-
-/*
-int is_unique()
-{
-	int i,j;
-	int count; // Compte les ocurrences
-	
-	for(i=0;i<sizeofliste1;i++)
-	{
-		for(j=0;i<sizeofliste2;j++)
-		{
-			if(elementliste1 = elementliste2)
-			{
-				count += 1;
-				if(count == sizeofliste1)
-				{
-					return false;
-				}
-			}
-			else
-			{
-			}
-		}
-	}
-}*/

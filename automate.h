@@ -51,6 +51,9 @@ void init_transition(Transition* transition);
 /* Affiche les données d'automate*/
 void print_automate(Automate automate);
 
+/* Affiche les donnés d'un automate v2 */
+void print_automate2(Automate automate);
+
 /* Affiche l'alphabet d'un automate en entrée */
 void print_alphabet(Automate automate);
 
@@ -60,7 +63,8 @@ int word_execution(Automate automate,const char* word);
 /*Permet de faire une exécution sur un mot*/
 int word_execution2(Automate automate,const char* word,State state,int len);
 
-int id_end_state(char character_test, Automate automate, State state_test);
+/*Permet de renvoyer une valeur en fonction de word_execution2*/
+void print_resultat(int valeur);
 
 /*Ajoute un état a l'automate*/
 void add_state(State* state,Automate* automate);
@@ -71,14 +75,8 @@ void add_transition(State* start_state,char read_character,State* end_state,Auto
 /*Ajoute un caractère à l'alphabet de l'automate*/
 void add_character(char letter,Automate* automate);
 
-/*Fonction qui renvoye un automate déterministe*/
-Automate determinisation_automate(Automate AFN);
+int id_end_state(char character_test, Automate automate, State state_test);
 
-Automate automate_determinisation(Automate automate_source);
-
-Automate minimisation_automate(Automate automate_source,int*);
-
-Automate minimisation_automate_recursive(Automate automate_source);
 
 /***loadAutomate.c***/
 
@@ -115,9 +113,6 @@ int is_acceptor(State state,Automate AF);
 /*Renvoie vrai si un ensemble d'etats est présent dans une liste d'ensemble d'etats*/
 int is_in_set_list(Set_State* set_list, Set_State test_set,int len);
 
-/*Retourne l'index de la case qui contient le même ID que l'états testé*/
-int index_in_set(Set_State set,State test_state);
-
 /*Trouve l'index d'un set dans une liste de set*/
 int index_in_set_list(Set_State* set_list, Set_State test_set,int len);
 
@@ -129,5 +124,4 @@ Set_State pop_set_list(Set_State** set_list,int* len);
 
 /*Renvoie les états atteint quand on part d'une liste d'états pour lire un caractère*/
 Set_State find_end(char character_test, Automate automate, Set_State states_test);
-
 #endif

@@ -92,47 +92,63 @@ int word_execution2(Automate automate,const char* word,State state,int len){
 	return FALSE;
 }
 
-int word_execution(Automate automate, const char* word){
-	int i=0;
-	State current_state = automate.States[0];
-	int loop_without_transition;
-	char* cursor = NULL;
-	int success = TRUE;
-	cursor = (char*)calloc(sizeof(word),sizeof(char));
-	strcpy(cursor,word);
+void print_resultat(int valeur)
+{
+	if(valeur == TRUE){
+		printf("\n");
+		printf("OK\n");
+		printf("\n");
+	}
+	else{
+		printf("\n");
+		printf("KO\n");
+		printf("\n");
+	}
 	
-	while(*cursor != '\0'){
-		loop_without_transition += 1;
-		for(i=0;i<automate.nb_transition;i++){
-			if(automate.Transitions[i].initial->id == current_state.id){
-				if(automate.Transitions[i].read_character == *cursor){
-					current_state = *(automate.Transitions[i].end);
-					printf("(%d,%s) |- ",automate.Transitions[i].initial->id,cursor);
-					loop_without_transition = 0;
-					if(current_state.acceptor == FALSE){
-						success = FALSE;
-					}else{
-						success = TRUE;
-					}
-				}
-			}
-		}
-		if(loop_without_transition == 0){
-			cursor++;
-		}
-		if(loop_without_transition == 1){
-			success = FALSE;
-			break;
+	return;
+}
+
+void print_automate2(Automate automate)
+{
+	int i,j;
+	
+	printf("%d\n",automate.nb_states);
+	for(i=0;i<automate.nb_states;i++){
+		if(automate.States[i].acceptor == TRUE){
+			printf("%d ",automate.States[i].id);
 		}
 	}
-	if(success == TRUE){
-		printf("(%d, ) |- ",current_state.id);
-		printf("ok\n");
-		return TRUE;
-	}else{
-		printf("(%d, %s) |- ",current_state.id,cursor);
-		printf("ko\n");
-		return FALSE;
+	printf("\n");
+	
+	printf("  ");
+	for(i=0;i<automate.nb_alphabet;i++){
+		printf("%c ",automate.alphabet[i]);
+	}
+	printf("\n");
+	
+	for(i=0;i<automate.nb_transition;i=i+automate.nb_alphabet){
+		
+		printf("%d ",automate.Transitions[i].initial->id);
+		for(j=0;j<automate.nb_alphabet;j++){
+			
+			printf("%d ",automate.Transitions[i+j].end->id);
+		}
+		printf("\n");
+	}
+	printf("\n");
+	
+	return;
+}
+
+
+void print_alphabet(Automate automate)
+{
+	printf("---------- Alphabet de l'automate ----------------\n");
+	int i = 0;
+	
+	for(i=0;i<automate.nb_alphabet;i++){
+		
+		printf(" %c\n",automate.alphabet[i]);
 	}
 	return 0;
 }
@@ -311,7 +327,6 @@ Automate minimisation_automate(Automate automate_source,int* first_state){
 	}
 	group_index += 1;
 	
-
 	/*On parcours les états de base 2 à 2*/
 	for(i=0;i<automate_source.nb_states;i++){
 		for(j=i+1;j<automate_source.nb_states;j++){
@@ -388,8 +403,6 @@ Automate minimisation_automate(Automate automate_source,int* first_state){
 	}
 	
 	*first_state = minimal_set.list[0].id;
-
-		
 	
 	printf("\nminimal_set:\n");
 	for(i=0;i<minimal_set.size;i++){
