@@ -108,6 +108,7 @@ void print_resultat(int valeur)
 	return;
 }
 
+
 void print_automate2(Automate automate)
 {
 	int i,j;
@@ -140,19 +141,6 @@ void print_automate2(Automate automate)
 	return;
 }
 
-
-void print_alphabet(Automate automate)
-{
-	printf("---------- Alphabet de l'automate ----------------\n");
-	int i = 0;
-	
-	for(i=0;i<automate.nb_alphabet;i++){
-		
-		printf(" %c\n",automate.alphabet[i]);
-	}
-	return 0;
-}
-
 int id_end_state(char character_test, Automate automate, State state_test){
 	int i = 0;
 	int end_state = -1;
@@ -172,11 +160,13 @@ void print_alphabet(Automate automate)
 	printf("---------- Alphabet de l'automate ----------------\n");
 	int i = 0;
 	
-	for(i=0;i<automate.nb_alphabet;i++)
-	{
+	for(i=0;i<automate.nb_alphabet;i++){
+		
 		printf(" %c\n",automate.alphabet[i]);
 	}
 	printf("---------------------------------------------------\n");
+	
+	return;
 }
 
 
@@ -272,16 +262,14 @@ Automate automate_determinisation(Automate automate_source){
 
 Automate minimisation_automate_recursive(Automate automate_source){
 	Automate automate_minimal;
-	int first_state;
-	int index;
+	int first_state_index;
 	init_automate(&automate_minimal);
-	automate_minimal = minimisation_automate(automate_source,&first_state);
+	automate_minimal = minimisation_automate(automate_source,&first_state_index);
 	if(automate_minimal.nb_states == automate_source.nb_states){
-		State tmp;
-		index = first_state;
-		tmp = automate_minimal.States[0];
-		automate_minimal.States[0] = automate_minimal.States[index];
-		automate_minimal.States[index] = tmp;
+		State tmp1;
+		tmp1 = automate_minimal.States[0];
+		automate_minimal.States[0] = automate_minimal.States[first_state_index];
+		automate_minimal.States[first_state_index] = tmp1;
 		return automate_minimal;
 	}else{
 		return minimisation_automate_recursive(automate_minimal);
@@ -294,7 +282,6 @@ Automate minimisation_automate(Automate automate_source,int* first_state){
 	int j=0;
 	int k=0;
 	int ii = 0;
-	int jj = 0;
 	int kk = 0;
 	
 	/*compte les nouveaux états*/
@@ -401,14 +388,8 @@ Automate minimisation_automate(Automate automate_source,int* first_state){
 			add_transition(&automate_minimal.States[i],automate_minimal.alphabet[j],&automate_minimal.States[minimal_set.list[kk].id],&automate_minimal);
 		}
 	}
-	
+
 	*first_state = minimal_set.list[0].id;
 	
-	printf("\nminimal_set:\n");
-	for(i=0;i<minimal_set.size;i++){
-		printf("ancien:%d minimal:%d\n",i,minimal_set.list[i].id);
-	}
-	printf("\n");
-
 	return automate_minimal;
 }

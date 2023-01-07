@@ -43,7 +43,6 @@ int main(int argc,char** argv){
 	automate = read_file(argv[1]);
 	automate_determined = automate_determinisation(automate);
 	automate_minimal = minimisation_automate_recursive(automate_determined);
-	
 	for(j=0;j<3;j++)
 	{
 		for(i=0;i<nb_mots;i++){
@@ -73,7 +72,6 @@ int main(int argc,char** argv){
 				}
 				//printf("Part 3 : COMING SOON\n");
 				print_resultat(word_execution2(automate_minimal,a_mots[i],automate.States[0],0));
-				
 			}
 			
 		}

@@ -58,9 +58,6 @@ void print_automate2(Automate automate);
 void print_alphabet(Automate automate);
 
 /*Permet de faire une exécution sur un mot*/
-int word_execution(Automate automate,const char* word);
-
-/*Permet de faire une exécution sur un mot*/
 int word_execution2(Automate automate,const char* word,State state,int len);
 
 /*Permet de renvoyer une valeur en fonction de word_execution2*/
@@ -75,7 +72,15 @@ void add_transition(State* start_state,char read_character,State* end_state,Auto
 /*Ajoute un caractère à l'alphabet de l'automate*/
 void add_character(char letter,Automate* automate);
 
+/*Donne l'id de l'état final d'une transition pour un état*/
 int id_end_state(char character_test, Automate automate, State state_test);
+
+/*Fonction pour la déterminisation*/
+Automate automate_determinisation(Automate automate_source);
+
+/*Fonction pour la minimisation*/
+Automate minimisation_automate(Automate automate_source,int* first_state);
+Automate minimisation_automate_recursive(Automate automate_source);
 
 
 /***loadAutomate.c***/
@@ -112,6 +117,9 @@ int is_acceptor(State state,Automate AF);
 
 /*Renvoie vrai si un ensemble d'etats est présent dans une liste d'ensemble d'etats*/
 int is_in_set_list(Set_State* set_list, Set_State test_set,int len);
+
+/*Trouve l'index de l'états dans l'ensemble des états*/
+int index_in_set(Set_State set,State test_state);
 
 /*Trouve l'index d'un set dans une liste de set*/
 int index_in_set_list(Set_State* set_list, Set_State test_set,int len);
