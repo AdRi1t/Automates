@@ -11,11 +11,12 @@
 #include "automate.h"
 #include "set.h"
 
+/* Initialise un ensemble vide*/
 void init_set(Set_State* set){
 	set->size = 0;
 	set->list = (State*)malloc(sizeof(State)*1);
 }
-
+/* Initialise une transition vide*/
 void init_transition(Transition* transition){
 	transition->initial = (State*)malloc(sizeof(State)*1);
     transition->read_character = '\0';
