@@ -8,7 +8,6 @@
  */
 
 
-
 #ifndef SET_H
 #define SET_H
 
@@ -18,6 +17,7 @@
 #include <errno.h>
 #include <unistd.h>
 #include <ctype.h>
+
 #include "automate.h"
 
 /*Permets d'avoir une liste d'etats avec sa taille*/

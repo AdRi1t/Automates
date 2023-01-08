@@ -195,8 +195,6 @@ Automate automate_determinisation(Automate automate_source){
 	int k = 0;
 	int l = 0;
 	Automate automate_determined;
-	State new_state;
-	State null_state;
 	/*Ensemble d'états de départ d'une transition*/
 	Set_State start_set;
 	/*Ensemble d'états de fin d'une transition*/
@@ -214,9 +212,6 @@ Automate automate_determinisation(Automate automate_source){
 	discovered = (Set_State*)malloc(sizeof(Set_State)*1);
 	processed = (Set_State*)malloc(sizeof(Set_State)*1);
 	translate = (Set_State*)malloc(sizeof(Set_State)*1);
-	
-	null_state.id = -1;
-	null_state.acceptor = FALSE;
 	
 	init_automate(&automate_determined);
 	automate_determined.nb_alphabet = automate_source.nb_alphabet;
@@ -309,7 +304,6 @@ Automate minimisation_automate(Automate automate_source,int* first_state){
 	int same_state = FALSE;
 	int different_state = FALSE;
 	Automate automate_minimal;
-	State new_state;
 	/*Contient l'ID des nouveaux états minimisés, leur position est leur ancien ID*/
 	Set_State minimal_set;
 	

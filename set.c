@@ -8,7 +8,6 @@
  * fonctions pour des listes d'ensemble d'états
  * 
  **/
-
 #include "automate.h"
 #include "set.h"
 
