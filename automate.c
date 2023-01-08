@@ -1,4 +1,15 @@
+/**
+ * @file automate.c
+ * @author Adrien Taberner & Othmane Abdimi
+ * @date 2023-01-09
+ * 
+ * Fonctions de manipulation des automates, de lecture de mots,
+ * de déterminisation et de minimisation.
+ * 
+ **/
+
 #include "automate.h"
+#include "set.h"
 
 void init_automate(Automate* automate){
 	automate->nb_states = 0;
@@ -27,12 +38,14 @@ void print_automate(Automate automate){
 	}
 }
 
+/* Ajoute un état à la liste des états de l'automate*/
 void add_state(State* state,Automate* automate){
 	automate->States = (State*)realloc(automate->States,(automate->nb_states+1) * sizeof(State));
 	automate->States[automate->nb_states] = *state;
 	automate->nb_states += 1;
 }
 
+/* Ajoute une transition à la liste de transition de l'automate*/
 void add_transition(State* start_state,char read_character,State* end_state,Automate* automate){
 	Transition transition;
 	init_transition(&transition);
@@ -51,6 +64,7 @@ void add_character(char letter,Automate* automate){
 	automate->nb_alphabet += 1;
 }
 
+/*Fonction récursive de la lecture d'un mot */
 int word_execution2(Automate automate,const char* word,State state,int len){
 	int i=0;
 	int j=0;
@@ -141,6 +155,10 @@ void print_automate2(Automate automate)
 	return;
 }
 
+/* 
+* Renvoie l'ID de l'état atteint depuis un état de départ et un caractère donné.
+* À utiliser sur un automate déterministe !
+*/
 int id_end_state(char character_test, Automate automate, State state_test){
 	int i = 0;
 	int end_state = -1;
@@ -169,7 +187,7 @@ void print_alphabet(Automate automate)
 	return;
 }
 
-
+/* Fonction pour la déterminisation non récursive*/
 Automate automate_determinisation(Automate automate_source){
  
 	int i = 0;
@@ -179,17 +197,17 @@ Automate automate_determinisation(Automate automate_source){
 	Automate automate_determined;
 	State new_state;
 	State null_state;
-	/*Ensemble d'état de départ d'une transition*/
+	/*Ensemble d'états de départ d'une transition*/
 	Set_State start_set;
-	/*Ensemble d'état de fin d'une transition*/
+	/*Ensemble d'états de fin d'une transition*/
 	Set_State end_set;
-	/*Pile des états découvert mais pas encore traité*/
+	/*File des états découverts mais pas encore traités*/
 	Set_State* discovered;
 	int nb_discovered = 0;
-	/*Tableau des états d'arrivé pour un caractére donné et un etats de départ*/
+	/*Tableau des états d'arrivée pour un caractère donné et un état de départ*/
 	Set_State* processed;
 	int nb_processed= 0;
-	/*Tableau des nouveau ensemble états qui on été traité*/
+	/*Tableau des nouveaux ensemble états qui ont été traités*/
 	Set_State* translate;
 	int nb_translate = 0;
 	
@@ -209,7 +227,7 @@ Automate automate_determinisation(Automate automate_source){
 	add_state_set(&start_set,automate_source.States[0]);
 	add_set_list(&discovered,start_set,&nb_discovered);
 	
-	/*Tant que on découvre des nouveau ensemble d'état on continue*/
+	/*Tant qu'on découvre des nouveaux ensemble d'états on continue*/
 	while( nb_discovered > 0){
 
 		for(i=0;i<automate_source.nb_alphabet;i++){
@@ -224,16 +242,16 @@ Automate automate_determinisation(Automate automate_source){
 				add_set_list(&processed,end_set,&nb_processed);
 			}
 		}
-		/*On a fini de traité l'état*/
+		/*On a fini de traiter l'état*/
 		if(is_in_set_list(translate,start_set,nb_translate)== FALSE){
 			add_set_list(&translate,start_set,&nb_translate);
 		}
-		/*On prend un nouvelle état*/
+		/*On prend un nouvel état*/
 		do{
 			start_set = pop_set_list(&discovered,&nb_discovered);
 		}while(is_in_set_list(translate,start_set,nb_translate));
 	}
-	/*On construit les états de base de l'automate deterministe avec l'indice des ensemble d'états testé*/
+	/*On construit les états de base de l'automate déterministe avec l'indice des ensembles d'états testés*/
 	for(j=0;j<nb_translate;j++){
 		State* p_new_state = (State*)malloc(sizeof(State));
 		p_new_state->id = index_in_set_list(translate,translate[j],nb_translate);
@@ -248,7 +266,7 @@ Automate automate_determinisation(Automate automate_source){
 			}
 		}
 	}
-	/*On construit les Transitions*/
+	/*On construit les transitions*/
 	k = 0 ;
 	for(i=0;i<nb_translate;i++){
 		for(j=0;j<automate_determined.nb_alphabet;j++){
@@ -260,12 +278,14 @@ Automate automate_determinisation(Automate automate_source){
 	return automate_determined;
 }
 
+/* Appel récursivement la fonction de minimisation tant que le nombre d'états est différent */
 Automate minimisation_automate_recursive(Automate automate_source){
 	Automate automate_minimal;
 	int first_state_index;
 	init_automate(&automate_minimal);
 	automate_minimal = minimisation_automate(automate_source,&first_state_index);
 	if(automate_minimal.nb_states == automate_source.nb_states){
+		/* On cherche l'état initial car la minimisation peut le faire changer d'ID, seul l'état 0 est initial.*/
 		State tmp1;
 		tmp1 = automate_minimal.States[0];
 		automate_minimal.States[0] = automate_minimal.States[first_state_index];
@@ -276,7 +296,7 @@ Automate minimisation_automate_recursive(Automate automate_source){
 	}
 }
 
-
+/* Minimisation de l'automate en entrer l'automate en sortie peut encore être minimisée */
 Automate minimisation_automate(Automate automate_source,int* first_state){
 	int i=0;
 	int j=0;
@@ -290,7 +310,7 @@ Automate minimisation_automate(Automate automate_source,int* first_state){
 	int different_state = FALSE;
 	Automate automate_minimal;
 	State new_state;
-	/*Contient l'ID des nouveaus états minimisée, leur position est leur ancien ID*/
+	/*Contient l'ID des nouveaux états minimisés, leur position est leur ancien ID*/
 	Set_State minimal_set;
 	
 	init_automate(&automate_minimal);
@@ -314,10 +334,10 @@ Automate minimisation_automate(Automate automate_source,int* first_state){
 	}
 	group_index += 1;
 	
-	/*On parcours les états de base 2 à 2*/
+	/*On parcours les états de automate source 2 à 2*/
 	for(i=0;i<automate_source.nb_states;i++){
 		for(j=i+1;j<automate_source.nb_states;j++){
-			/*Si il ne sont pas different dans le nouveau set minimal*/
+			/*Si ils ne sont pas différents dans le nouveau set minimal*/
 			if(minimal_set.list[i].id == minimal_set.list[j].id){
 				different_state = FALSE;
 				for(k=0;k<automate_source.nb_alphabet;k++){
@@ -332,7 +352,7 @@ Automate minimisation_automate(Automate automate_source,int* first_state){
 					/*On différencie les nouveau états minimal*/
 					group_index += 1;
 					minimal_set.list[i].id = group_index;
-					/*On cherche les etats avec les meme etats d'arrivé que celui qu'on vient de changer*/
+					/*On cherche les etats avec les même etat d'arrivé que celui qu'on vient de changer*/
 					/*Comme ça les groupes sont conservée*/
 					for(ii=i;ii<automate_source.nb_states;ii++){
 						same_state = TRUE;
@@ -364,7 +384,7 @@ Automate minimisation_automate(Automate automate_source,int* first_state){
 		}
 	}
 	
-	/*On construit les états de base de l'automate deterministe avec l'indice des ensemble d'états testé*/
+	/*On construit les états de base de l'automate deterministe avec l'indice des ensembles d'états testé*/
 	for(i=0;i<=group_index;i++){
 		State* p_new_state = (State*)malloc(sizeof(State));
 		p_new_state->id = i;

@@ -1,4 +1,19 @@
+/**
+ * @file main.c
+ * @author Adrien Taberner & Othmane Abdimi
+ * @date 2023-01-09
+ * 
+ * Fichier principal, on exécute dans l'ordre:
+ *   - Lecture de l'automate
+ *   - Lecture d'un mot par l'automate
+ *   - Determinisation puis exécution sur le mot
+ *   - Minimisation puis exécution sur le mot
+ * 
+ **/
+
+
 #include "automate.h"
+#include "set.h"
 
 int main(int argc,char** argv){
 	Automate automate;
@@ -70,7 +85,6 @@ int main(int argc,char** argv){
 				{
 					print_automate2(automate_minimal);
 				}
-				//printf("Part 3 : COMING SOON\n");
 				print_resultat(word_execution2(automate_minimal,a_mots[i],automate.States[0],0));
 			}
 			

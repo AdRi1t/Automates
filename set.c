@@ -1,4 +1,16 @@
+/**
+ * @file set.c
+ * @author Adrien Taberner & Othmane Abdimi
+ * @date 2023-01-09
+ * 
+ * Fonctions pour la manipulations d'ensemble d'états,
+ * de parcours de transition pour un ensemble d'États et
+ * fonctions pour des listes d'ensemble d'états
+ * 
+ **/
+
 #include "automate.h"
+#include "set.h"
 
 void init_set(Set_State* set){
 	set->size = 0;
@@ -11,18 +23,21 @@ void init_transition(Transition* transition){
     transition->end = (State*)malloc(sizeof(State)*1);
 }
 
+/* Ajoute un état dans un ensemble(set) d'états*/
 void add_state_set(Set_State* set,State state){
 	set->list = realloc(set->list,(set->size+1)*sizeof(State));
 	set->list[set->size] = state;
 	set->size += 1;
 }
 
+/* Ajoute un set dans une liste de set la taille doit être passer en paramètre */
 void add_set_list(Set_State** set_list,Set_State set,int* len){
 	*set_list = (Set_State*)realloc(*set_list,(*len+1)*sizeof(Set_State));
 	(*set_list)[*len] = set;
 	*len += 1;
 }
 
+/* Enlève le dernier élément de la liste et le renvoie*/
 Set_State pop_set_list(Set_State** set_list,int* len){
 	Set_State set;
 	init_set(&set);
@@ -34,6 +49,7 @@ Set_State pop_set_list(Set_State** set_list,int* len){
 	return set;
 }
 
+/* Retourne vrai si l'etat est dans le set*/
 int is_in_set(Set_State set, State test_state){
 	int is_in = FALSE;
 	int i=0;
@@ -59,6 +75,7 @@ int is_acceptor(State state,Automate AF)
 	return is_acceptor;
 }
 
+/* Retourne vrai si le set est dans la liste de set*/
 int is_in_set_list(Set_State* set_list, Set_State test_set,int len){
 	int is_in = FALSE;
 	int i=0;
@@ -78,6 +95,7 @@ int is_in_set_list(Set_State* set_list, Set_State test_set,int len){
 	return is_in;
 }
 
+/* Renvoie l'index d'un état contenu dans un ensemble*/
 int index_in_set(Set_State set,State test_state){
 	int index = -1;
 	int i=0;
@@ -89,6 +107,7 @@ int index_in_set(Set_State set,State test_state){
 	return index;
 }
 
+ /* Renvoie l'index d'un ensemble état contenu dans une liste ensemble d'etats*/
 int index_in_set_list(Set_State* set_list, Set_State test_set,int len){
 	int index = -1;
 	int i=0;
@@ -108,6 +127,7 @@ int index_in_set_list(Set_State* set_list, Set_State test_set,int len){
 	return index;
 }
 
+/* Donne un ensemble d'états de fin pour un ensemble d'états de départ et un caractère*/
 Set_State find_end(char character_test, Automate automate, Set_State states_test){
 	int i = 0;
 	int j = 0;

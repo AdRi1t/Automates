@@ -1,5 +1,16 @@
-#include "automate.h"
+/**
+ * @file loadAutomate.c
+ * @author Adrien Taberner & Othmane Abdimi
+ * @date 2023-01-09
+ * 
+ * Fonction pour construire l'automate depuis un fichier
+ * 
+ */
 
+#include "automate.h"
+#include "set.h"
+
+/* Renvoie l'automate contenu dans le fichier dont le nom est passé en paramètre*/
 Automate read_file(char* file_tmp){
 	char* file_name = NULL;
 	char* line = NULL;
@@ -38,6 +49,7 @@ Automate read_file(char* file_tmp){
 	return automate;
 }
 
+/* Prends un string qui contient un ensemble de nombres prend en paramètre le nombre de nombre à lire */
 int* numbers_from_string(char* str_read, int nb_numbers) {
 	char* ptr_str = str_read;
 	int* numbers = malloc(nb_numbers*sizeof(int));
@@ -58,6 +70,7 @@ int* numbers_from_string(char* str_read, int nb_numbers) {
   return numbers;
 }
 
+/* Prends une chaine de caractère et la transforme en transition pour ensuite l'ajouter à automate*/
 void set_transition(char* str,Automate* automate){
 	char* ptr_str = str;
 	int count = 0;
@@ -96,6 +109,7 @@ void set_character(char letter,Automate* automate){
 	add_character(letter,automate);
 }
 
+/* Initialise les états. On lui donne la liste des ID accepteurs */
 void init_states(int nb_etats, int* id_etats_accepteur,Automate* automate){
 	State* States = NULL;
 	States = (State*)malloc(nb_etats*sizeof(State));
